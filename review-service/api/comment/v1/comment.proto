@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package api.comment.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "review-service/api/comment/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.comment.v1";
+
+// 评论所挂载的内容类型（知乎：问题 / 回答 / 文章 / 想法等，可按产品扩展）
+enum CommentTargetType {
+  COMMENT_TARGET_TYPE_UNSPECIFIED = 0;
+  COMMENT_TARGET_TYPE_QUESTION = 1;
+  COMMENT_TARGET_TYPE_ANSWER = 2;
+  COMMENT_TARGET_TYPE_ARTICLE = 3;
+  COMMENT_TARGET_TYPE_PIN = 4; // 想法/动态类内容
+}
+
+enum CommentSort {
+  COMMENT_SORT_UNSPECIFIED = 0;
+  COMMENT_SORT_CREATED_AT_ASC = 1;
+  COMMENT_SORT_CREATED_AT_DESC = 2;
+  COMMENT_SORT_HOT = 3;
+}
+
+
+service CommentService {
+  rpc CreateComment (CreateCommentRequest) returns (CreateCommentReply) {
+    option (google.api.http) = {
+      post: "/v1/comments"
+      body: "*"
+    };
+  }
+  rpc UpdateComment (UpdateCommentRequest) returns (UpdateCommentReply) {
+    option (google.api.http) = {
+      put: "/v1/comments/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteComment (DeleteCommentRequest) returns (DeleteCommentReply) {
+    option (google.api.http) = {
+      delete: "/v1/comments/{id}"
+    };
+  }
+  rpc GetComment (GetCommentRequest) returns (GetCommentReply) {
+    option (google.api.http) = {
+      get: "/v1/comments/{id}"
+    };
+  }
+  // parent_id=0 拉顶层评论；非 0 拉该评论下的直接子回复
+  rpc ListComments (ListCommentsRequest) returns (ListCommentsReply) {
+    option (google.api.http) = {
+      get: "/v1/comments"
+    };
+  }
+}
+
+message CreateCommentRequest {
+  CommentTargetType target_type = 1;
+  int64 target_id = 2;
+  int64 parent_id = 3; // 0 表示顶层评论；否则为父评论 id
+  int64 reply_to_user_id = 4; // 可选，展示「回复 @某人」
+  string content = 5;
+  repeated string attachment_urls = 6; // 可选，图片等
+}
+
+message CreateCommentReply {
+  int64 id = 1;
+}
+
+message UpdateCommentRequest {
+  int64 id = 1;
+  string content = 2;
+}
+
+message UpdateCommentReply {}
+
+message DeleteCommentRequest {
+  int64 id = 1;
+}
+
+message DeleteCommentReply {}
+
+message GetCommentRequest {
+  int64 id = 1;
+}
+
+message GetCommentReply {
+  Comment comment = 1;
+}
+
+message ListCommentsRequest {
+  CommentTargetType target_type = 1;
+  int64 target_id = 2;
+  int64 parent_id = 3; // 0 顶层；非 0 某条的子评论列表
+  CommentSort sort = 4;
+  int32 page_size = 5;
+  string page_token = 6;
+}
+
+message ListCommentsReply {
+  repeated Comment comments = 1;
+  string next_page_token = 2;
+  int64 total = 3; // 可选，列表总数（分页 UI）
+}
+
+message Comment {
+  int64 id = 1;
+  int64 author_user_id = 2;
+  CommentTargetType target_type = 3;
+  int64 target_id = 4;
+  int64 parent_id = 5;
+  int64 reply_to_user_id = 6;
+  string content = 7;
+  int32 reply_count = 8;
+  int32 like_count = 9;
+  repeated string attachment_urls = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}

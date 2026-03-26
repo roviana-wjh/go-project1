@@ -1,0 +1,315 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /helloworld/{name}:
+        get:
+            tags:
+                - Greeter
+            description: Sends a greeting
+            operationId: Greeter_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+    /v1/comments:
+        get:
+            tags:
+                - CommentService
+            description: parent_id=0 拉顶层评论；非 0 拉该评论下的直接子回复
+            operationId: CommentService_ListComments
+            parameters:
+                - name: targetType
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: targetId
+                  in: query
+                  schema:
+                    type: string
+                - name: parentId
+                  in: query
+                  schema:
+                    type: string
+                - name: sort
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageToken
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.comment.v1.ListCommentsReply'
+        post:
+            tags:
+                - CommentService
+            operationId: CommentService_CreateComment
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.comment.v1.CreateCommentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.comment.v1.CreateCommentReply'
+    /v1/comments/{id}:
+        get:
+            tags:
+                - CommentService
+            operationId: CommentService_GetComment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.comment.v1.GetCommentReply'
+        put:
+            tags:
+                - CommentService
+            operationId: CommentService_UpdateComment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.comment.v1.UpdateCommentRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.comment.v1.UpdateCommentReply'
+        delete:
+            tags:
+                - CommentService
+            operationId: CommentService_DeleteComment
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.comment.v1.DeleteCommentReply'
+    /v1/review:
+        post:
+            tags:
+                - Review
+            operationId: Review_CreateReview
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.review.v1.CreateReviewRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.review.v1.CreateReviewReply'
+    /v1/review/reply:
+        post:
+            tags:
+                - Review
+            operationId: Review_ReplyReview
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.review.v1.ReplyReviewRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.review.v1.ReplyReviewReply'
+components:
+    schemas:
+        api.comment.v1.Comment:
+            type: object
+            properties:
+                id:
+                    type: string
+                authorUserId:
+                    type: string
+                targetType:
+                    type: integer
+                    format: enum
+                targetId:
+                    type: string
+                parentId:
+                    type: string
+                replyToUserId:
+                    type: string
+                content:
+                    type: string
+                replyCount:
+                    type: integer
+                    format: int32
+                likeCount:
+                    type: integer
+                    format: int32
+                attachmentUrls:
+                    type: array
+                    items:
+                        type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        api.comment.v1.CreateCommentReply:
+            type: object
+            properties:
+                id:
+                    type: string
+        api.comment.v1.CreateCommentRequest:
+            type: object
+            properties:
+                targetType:
+                    type: integer
+                    format: enum
+                targetId:
+                    type: string
+                parentId:
+                    type: string
+                replyToUserId:
+                    type: string
+                content:
+                    type: string
+                attachmentUrls:
+                    type: array
+                    items:
+                        type: string
+        api.comment.v1.DeleteCommentReply:
+            type: object
+            properties: {}
+        api.comment.v1.GetCommentReply:
+            type: object
+            properties:
+                comment:
+                    $ref: '#/components/schemas/api.comment.v1.Comment'
+        api.comment.v1.ListCommentsReply:
+            type: object
+            properties:
+                comments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.comment.v1.Comment'
+                nextPageToken:
+                    type: string
+                total:
+                    type: string
+        api.comment.v1.UpdateCommentReply:
+            type: object
+            properties: {}
+        api.comment.v1.UpdateCommentRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                content:
+                    type: string
+        api.review.v1.CreateReviewReply:
+            type: object
+            properties:
+                reviewID:
+                    type: string
+        api.review.v1.CreateReviewRequest:
+            type: object
+            properties:
+                userID:
+                    type: string
+                orderID:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                serviceScore:
+                    type: integer
+                    format: int32
+                expressScore:
+                    type: integer
+                    format: int32
+                content:
+                    type: string
+                picInfo:
+                    type: string
+                videoInfo:
+                    type: string
+                anonymous:
+                    type: boolean
+            description: 创建评价参数
+        api.review.v1.ReplyReviewReply:
+            type: object
+            properties: {}
+        api.review.v1.ReplyReviewRequest:
+            type: object
+            properties: {}
+        helloworld.v1.HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
+tags:
+    - name: CommentService
+    - name: Greeter
+      description: The greeting service definition.
+    - name: Review
+      description: 创建评价
