@@ -19,18 +19,56 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationReviewAppealReview = "/api.review.v1.Review/AppealReview"
+const OperationReviewAuditAppeal = "/api.review.v1.Review/AuditAppeal"
+const OperationReviewAuditReview = "/api.review.v1.Review/AuditReview"
 const OperationReviewCreateReview = "/api.review.v1.Review/CreateReview"
+const OperationReviewDeleteReview = "/api.review.v1.Review/DeleteReview"
+const OperationReviewGetReview = "/api.review.v1.Review/GetReview"
+const OperationReviewListReview = "/api.review.v1.Review/ListReview"
+const OperationReviewListReviewByStoreId = "/api.review.v1.Review/ListReviewByStoreId"
+const OperationReviewListReviewByUseId = "/api.review.v1.Review/ListReviewByUseId"
 const OperationReviewReplyReview = "/api.review.v1.Review/ReplyReview"
+const OperationReviewUpdateReview = "/api.review.v1.Review/UpdateReview"
 
 type ReviewHTTPServer interface {
+	// AppealReview 商家申诉评价
+	AppealReview(context.Context, *AppealReviewRequest) (*AppealReviewReply, error)
+	// AuditAppeal 运营审核申诉
+	AuditAppeal(context.Context, *AuditAppealRequest) (*AuditAppealReply, error)
+	// AuditReview 运营审核评价
+	AuditReview(context.Context, *AuditReviewRequest) (*AuditReviewReply, error)
+	// CreateReview 创建评价
 	CreateReview(context.Context, *CreateReviewRequest) (*CreateReviewReply, error)
+	// DeleteReview 删除评价
+	DeleteReview(context.Context, *DeleteReviewRequest) (*DeleteReviewReply, error)
+	// GetReview 获取单条评价（路径避免与 /v1/review/order、/v1/review/user 冲突）
+	GetReview(context.Context, *GetReviewRequest) (*GetReviewReply, error)
+	// ListReview 按订单分页列评价
+	ListReview(context.Context, *ListReviewRequest) (*ListReviewReply, error)
+	// ListReviewByStoreId 按店铺分页列评价
+	ListReviewByStoreId(context.Context, *ListReviewByStoreIdRequest) (*ListReviewByStoreIdReply, error)
+	// ListReviewByUseId 按用户分页列评价
+	ListReviewByUseId(context.Context, *ListReviewByUseIdRequest) (*ListReviewReply, error)
+	// ReplyReview 商家回复评价
 	ReplyReview(context.Context, *ReplyReviewRequest) (*ReplyReviewReply, error)
+	// UpdateReview 修改评价
+	UpdateReview(context.Context, *UpdateReviewRequest) (*UpdateReviewReply, error)
 }
 
 func RegisterReviewHTTPServer(s *http.Server, srv ReviewHTTPServer) {
 	r := s.Route("/")
 	r.POST("/v1/review", _Review_CreateReview0_HTTP_Handler(srv))
+	r.PUT("/v1/review/{reviewID}", _Review_UpdateReview0_HTTP_Handler(srv))
+	r.DELETE("/v1/review/{reviewID}", _Review_DeleteReview0_HTTP_Handler(srv))
+	r.GET("/v1/review/detail/{reviewID}", _Review_GetReview0_HTTP_Handler(srv))
+	r.GET("/v1/review/order/{orderID}", _Review_ListReview0_HTTP_Handler(srv))
+	r.POST("/v1/review/audit", _Review_AuditReview0_HTTP_Handler(srv))
 	r.POST("/v1/review/reply", _Review_ReplyReview0_HTTP_Handler(srv))
+	r.POST("/v1/review/appeal", _Review_AppealReview0_HTTP_Handler(srv))
+	r.POST("/v1/review/appeal/audit", _Review_AuditAppeal0_HTTP_Handler(srv))
+	r.GET("/v1/review/user/{userID}", _Review_ListReviewByUseId0_HTTP_Handler(srv))
+	r.GET("/v1/review/store/{storeID}", _Review_ListReviewByStoreId0_HTTP_Handler(srv))
 }
 
 func _Review_CreateReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
@@ -51,6 +89,119 @@ func _Review_CreateReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Cont
 			return err
 		}
 		reply := out.(*CreateReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_UpdateReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateReviewRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewUpdateReview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateReview(ctx, req.(*UpdateReviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_DeleteReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteReviewRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewDeleteReview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteReview(ctx, req.(*DeleteReviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_GetReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetReviewRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewGetReview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetReview(ctx, req.(*GetReviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_ListReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListReviewRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewListReview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListReview(ctx, req.(*ListReviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_AuditReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AuditReviewRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewAuditReview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AuditReview(ctx, req.(*AuditReviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AuditReviewReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -77,9 +228,117 @@ func _Review_ReplyReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Conte
 	}
 }
 
+func _Review_AppealReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AppealReviewRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewAppealReview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AppealReview(ctx, req.(*AppealReviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AppealReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_AuditAppeal0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AuditAppealRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewAuditAppeal)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AuditAppeal(ctx, req.(*AuditAppealRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AuditAppealReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_ListReviewByUseId0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListReviewByUseIdRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewListReviewByUseId)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListReviewByUseId(ctx, req.(*ListReviewByUseIdRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_ListReviewByStoreId0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListReviewByStoreIdRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewListReviewByStoreId)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListReviewByStoreId(ctx, req.(*ListReviewByStoreIdRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListReviewByStoreIdReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ReviewHTTPClient interface {
+	// AppealReview 商家申诉评价
+	AppealReview(ctx context.Context, req *AppealReviewRequest, opts ...http.CallOption) (rsp *AppealReviewReply, err error)
+	// AuditAppeal 运营审核申诉
+	AuditAppeal(ctx context.Context, req *AuditAppealRequest, opts ...http.CallOption) (rsp *AuditAppealReply, err error)
+	// AuditReview 运营审核评价
+	AuditReview(ctx context.Context, req *AuditReviewRequest, opts ...http.CallOption) (rsp *AuditReviewReply, err error)
+	// CreateReview 创建评价
 	CreateReview(ctx context.Context, req *CreateReviewRequest, opts ...http.CallOption) (rsp *CreateReviewReply, err error)
+	// DeleteReview 删除评价
+	DeleteReview(ctx context.Context, req *DeleteReviewRequest, opts ...http.CallOption) (rsp *DeleteReviewReply, err error)
+	// GetReview 获取单条评价（路径避免与 /v1/review/order、/v1/review/user 冲突）
+	GetReview(ctx context.Context, req *GetReviewRequest, opts ...http.CallOption) (rsp *GetReviewReply, err error)
+	// ListReview 按订单分页列评价
+	ListReview(ctx context.Context, req *ListReviewRequest, opts ...http.CallOption) (rsp *ListReviewReply, err error)
+	// ListReviewByStoreId 按店铺分页列评价
+	ListReviewByStoreId(ctx context.Context, req *ListReviewByStoreIdRequest, opts ...http.CallOption) (rsp *ListReviewByStoreIdReply, err error)
+	// ListReviewByUseId 按用户分页列评价
+	ListReviewByUseId(ctx context.Context, req *ListReviewByUseIdRequest, opts ...http.CallOption) (rsp *ListReviewReply, err error)
+	// ReplyReview 商家回复评价
 	ReplyReview(ctx context.Context, req *ReplyReviewRequest, opts ...http.CallOption) (rsp *ReplyReviewReply, err error)
+	// UpdateReview 修改评价
+	UpdateReview(ctx context.Context, req *UpdateReviewRequest, opts ...http.CallOption) (rsp *UpdateReviewReply, err error)
 }
 
 type ReviewHTTPClientImpl struct {
@@ -90,6 +349,49 @@ func NewReviewHTTPClient(client *http.Client) ReviewHTTPClient {
 	return &ReviewHTTPClientImpl{client}
 }
 
+// AppealReview 商家申诉评价
+func (c *ReviewHTTPClientImpl) AppealReview(ctx context.Context, in *AppealReviewRequest, opts ...http.CallOption) (*AppealReviewReply, error) {
+	var out AppealReviewReply
+	pattern := "/v1/review/appeal"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationReviewAppealReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// AuditAppeal 运营审核申诉
+func (c *ReviewHTTPClientImpl) AuditAppeal(ctx context.Context, in *AuditAppealRequest, opts ...http.CallOption) (*AuditAppealReply, error) {
+	var out AuditAppealReply
+	pattern := "/v1/review/appeal/audit"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationReviewAuditAppeal))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// AuditReview 运营审核评价
+func (c *ReviewHTTPClientImpl) AuditReview(ctx context.Context, in *AuditReviewRequest, opts ...http.CallOption) (*AuditReviewReply, error) {
+	var out AuditReviewReply
+	pattern := "/v1/review/audit"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationReviewAuditReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// CreateReview 创建评价
 func (c *ReviewHTTPClientImpl) CreateReview(ctx context.Context, in *CreateReviewRequest, opts ...http.CallOption) (*CreateReviewReply, error) {
 	var out CreateReviewReply
 	pattern := "/v1/review"
@@ -103,6 +405,77 @@ func (c *ReviewHTTPClientImpl) CreateReview(ctx context.Context, in *CreateRevie
 	return &out, nil
 }
 
+// DeleteReview 删除评价
+func (c *ReviewHTTPClientImpl) DeleteReview(ctx context.Context, in *DeleteReviewRequest, opts ...http.CallOption) (*DeleteReviewReply, error) {
+	var out DeleteReviewReply
+	pattern := "/v1/review/{reviewID}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationReviewDeleteReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetReview 获取单条评价（路径避免与 /v1/review/order、/v1/review/user 冲突）
+func (c *ReviewHTTPClientImpl) GetReview(ctx context.Context, in *GetReviewRequest, opts ...http.CallOption) (*GetReviewReply, error) {
+	var out GetReviewReply
+	pattern := "/v1/review/detail/{reviewID}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationReviewGetReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListReview 按订单分页列评价
+func (c *ReviewHTTPClientImpl) ListReview(ctx context.Context, in *ListReviewRequest, opts ...http.CallOption) (*ListReviewReply, error) {
+	var out ListReviewReply
+	pattern := "/v1/review/order/{orderID}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationReviewListReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListReviewByStoreId 按店铺分页列评价
+func (c *ReviewHTTPClientImpl) ListReviewByStoreId(ctx context.Context, in *ListReviewByStoreIdRequest, opts ...http.CallOption) (*ListReviewByStoreIdReply, error) {
+	var out ListReviewByStoreIdReply
+	pattern := "/v1/review/store/{storeID}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationReviewListReviewByStoreId))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListReviewByUseId 按用户分页列评价
+func (c *ReviewHTTPClientImpl) ListReviewByUseId(ctx context.Context, in *ListReviewByUseIdRequest, opts ...http.CallOption) (*ListReviewReply, error) {
+	var out ListReviewReply
+	pattern := "/v1/review/user/{userID}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationReviewListReviewByUseId))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ReplyReview 商家回复评价
 func (c *ReviewHTTPClientImpl) ReplyReview(ctx context.Context, in *ReplyReviewRequest, opts ...http.CallOption) (*ReplyReviewReply, error) {
 	var out ReplyReviewReply
 	pattern := "/v1/review/reply"
@@ -110,6 +483,20 @@ func (c *ReviewHTTPClientImpl) ReplyReview(ctx context.Context, in *ReplyReviewR
 	opts = append(opts, http.Operation(OperationReviewReplyReview))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// UpdateReview 修改评价
+func (c *ReviewHTTPClientImpl) UpdateReview(ctx context.Context, in *UpdateReviewRequest, opts ...http.CallOption) (*UpdateReviewReply, error) {
+	var out UpdateReviewReply
+	pattern := "/v1/review/{reviewID}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationReviewUpdateReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,7 @@ type ReviewInfo struct {
 	UpdateBy     string    `gorm:"column:update_by;not null;comment:更新⽅标识" json:"update_by"`                          // 更新⽅标识
 	CreateAt     time.Time `gorm:"column:create_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"create_at"` // 创建时间
 	UpdateAt     time.Time `gorm:"column:update_at;not null;default:CURRENT_TIMESTAMP;comment:更新时间" json:"update_at"` // 更新时间
-	DeleteAt     time.Time `gorm:"column:delete_at;comment:逻辑删除标记" json:"delete_at"`                                  // 逻辑删除标记
+	DeleteAt     *time.Time `gorm:"column:delete_at;comment:逻辑删除标记" json:"delete_at"`                                 // 逻辑删除标记
 	Version      int32     `gorm:"column:version;not null;comment:乐观锁标记" json:"version"`                              // 乐观锁标记
 	ReviewID     int64     `gorm:"column:review_id;not null;comment:评价id" json:"review_id"`                           // 评价id
 	Content      string    `gorm:"column:content;not null;comment:评价内容" json:"content"`                               // 评价内容

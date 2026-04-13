@@ -18,7 +18,7 @@ type ReviewAppealInfo struct {
 	IsDel    int32     `gorm:"column:is_del;not null;comment:逻辑删除标记：0正常；1删除" json:"is_del"`                       // 逻辑删除标记：0正常；1删除
 	CreateAt time.Time `gorm:"column:create_at;not null;default:CURRENT_TIMESTAMP;comment:创建时间" json:"create_at"` // 创建时间
 	UpdateAt time.Time `gorm:"column:update_at;not null;default:CURRENT_TIMESTAMP;comment:更新时间" json:"update_at"` // 更新时间
-	DeleteAt time.Time `gorm:"column:delete_at;comment:逻辑删除标记" json:"delete_at"`                                  // 逻辑删除标记
+	DeleteAt *time.Time `gorm:"column:delete_at;comment:逻辑删除标记" json:"delete_at"`                                 // 逻辑删除标记
 	Version  int32     `gorm:"column:version;not null;comment:乐观锁标记" json:"version"`                              // 乐观锁标记
 	AppealID int64     `gorm:"column:appeal_id;not null;comment:回复id" json:"appeal_id"`                           // 回复id
 	ReviewID int64     `gorm:"column:review_id;not null;comment:评价id" json:"review_id"`                           // 评价id

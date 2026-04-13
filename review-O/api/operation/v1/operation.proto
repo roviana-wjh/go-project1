@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package api.operation.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "review-O/api/operation/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.operation.v1";
+
+// Operation 运营端：转发 review-service 的审核能力
+service Operation {
+	// 审核评价
+	rpc AuditReview (AuditReviewRequest) returns (AuditReviewReply) {
+		option (google.api.http) = {
+			post: "/v1/op/review/audit"
+			body: "*"
+		};
+	}
+	// 审核申诉
+	rpc AuditAppeal (AuditAppealRequest) returns (AuditAppealReply) {
+		option (google.api.http) = {
+			post: "/v1/op/review/appeal/audit"
+			body: "*"
+		};
+	}
+}
+
+message AuditReviewRequest {
+	int64 reviewID = 1 [(validate.rules).int64 = {gt: 0}];
+	// 1=通过 2=驳回（与 review-service 一致）
+	int32 result = 2 [(validate.rules).int32 = {in: [1, 2]}];
+	string remark = 3 [(validate.rules).string = {max_len: 2000}];
+	string operator = 4 [(validate.rules).string = {min_len: 1, max_len: 128}];
+}
+
+message AuditReviewReply {
+	int64 reviewID = 1;
+	int32 status = 2;
+}
+
+message AuditAppealRequest {
+	int64 appealID = 1 [(validate.rules).int64 = {gt: 0}];
+	int32 result = 2 [(validate.rules).int32 = {in: [1, 2]}];
+	string remark = 3 [(validate.rules).string = {max_len: 2000}];
+	string operator = 4 [(validate.rules).string = {min_len: 1, max_len: 128}];
+}
+
+message AuditAppealReply {}

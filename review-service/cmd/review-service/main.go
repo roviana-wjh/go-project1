@@ -12,6 +12,7 @@ import (
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
+	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 
@@ -19,26 +20,34 @@ import (
 )
 
 var (
-	Name     string
-	Version  string
+	Name     string = "review-service"
+	Version  string = "1.0.0"
 	flagconf string
 	id, _    = os.Hostname()
 )
 
 func defaultConfDir() string {
-	for _, p := range []string{"../../configs", "configs", "../configs"} {
+	// Order matters: from repo root (e.g. kratos run picking cmd), ../../configs may
+	// resolve to an unrelated directory; prefer this service's configs first.
+	for _, p := range []string{
+		"configs",
+		"../configs",
+		"review-service/configs",
+		"../review-service/configs",
+		"../../configs",
+	} {
 		if fi, err := os.Stat(p); err == nil && fi.IsDir() {
 			return p
 		}
 	}
-	return "../../configs"
+	return "review-service/configs"
 }
 
 func init() {
 	flag.StringVar(&flagconf, "conf", defaultConfDir(), "config directory (yaml inside)")
 }
 
-func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
+func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server, r registry.Registrar) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
@@ -46,6 +55,7 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 		kratos.Metadata(map[string]string{}),
 		kratos.Logger(logger),
 		kratos.Server(gs, hs),
+		kratos.Registrar(r),
 	)
 }
 
@@ -78,7 +88,7 @@ func main() {
 		}
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.Registry, bc.GetElasticsearch(), logger)
 	if err != nil {
 		panic(err)
 	}

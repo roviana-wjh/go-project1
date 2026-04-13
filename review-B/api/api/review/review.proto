@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package api.review.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "review-B/api/api/review;v1";
+option java_multiple_files = true;
+option java_package = "api.review.v1";
+
+//创建评价
+service Review {
+	rpc CreateReview (CreateReviewRequest) returns (CreateReviewReply) {
+		option (google.api.http) = {
+			post: "/v1/review"
+			body: "*"
+		};
+	}
+	//修改评价
+	rpc UpdateReview (UpdateReviewRequest) returns (UpdateReviewReply);
+	//删除评价
+	rpc DeleteReview (DeleteReviewRequest) returns (DeleteReviewReply);
+	//获取评价
+	rpc GetReview (GetReviewRequest) returns (GetReviewReply);
+	rpc ListReview (ListReviewRequest) returns (ListReviewReply);
+	//审核评价
+	rpc AuditReview (AuditReviewRequest) returns (AuditReviewReply);
+	//回复评价
+	rpc ReplyReview (ReplyReviewRequest) returns (ReplyReviewReply) {
+		option (google.api.http) = {
+			post: "/v1/review/reply",
+			body: "*"
+		};
+	}
+	//申诉评价
+	rpc AppealReview (AppealReviewRequest) returns (AppealReviewReply) {}
+	//审核评价
+	rpc AuditAppeal (AuditAppealRequest) returns (AuditAppealReply) {}
+	//通过id来显示评价
+	rpc ListReviewByUseId (ListReviewByUseIdRequest) returns (ListReviewReply) {}
+}
+
+// 创建评价参数
+message CreateReviewRequest {
+	int64 userID = 1 [(validate.rules).int64 = {gt: 0}];
+	int64 orderID = 2 [(validate.rules).int64 = {gt: 0}];
+	int32 score = 3 [(validate.rules).int32 = {gte: 0, lte: 5}];
+	int32 serviceScore = 4 [(validate.rules).int32 = {gte: 0, lte: 5}];
+	int32 expressScore = 5 [(validate.rules).int32 = {gte: 0, lte: 5}];
+	string content = 6 [(validate.rules).string = {min_len: 1, max_len: 5000}];
+	string picInfo = 7 [(validate.rules).string = {max_len: 8192}];
+	string videoInfo = 8 [(validate.rules).string = {max_len: 8192}];
+	bool anonymous = 9;
+}
+
+message CreateReviewReply {
+	int64 reviewID = 1;
+}
+
+message UpdateReviewRequest {}
+message UpdateReviewReply {}
+
+message DeleteReviewRequest {}
+message DeleteReviewReply {}
+
+message GetReviewRequest {}
+message GetReviewReply {}
+
+message ListReviewRequest {}
+message ListReviewReply {}
+
+message AuditReviewRequest {}
+message AuditReviewReply {}
+
+message AppealReviewRequest {}
+message AppealReviewReply {}
+
+message ReplyReviewRequest {
+	int64 reviewID = 1 [(validate.rules).int64 = {gt: 0}];
+	int64 storeID = 2 [(validate.rules).int64 = {gt: 0}];
+	string content = 3 [(validate.rules).string = {min_len: 1, max_len: 5000}];
+	string picInfo = 4 [(validate.rules).string = {max_len: 8192}];
+	string videoInfo = 5 [(validate.rules).string = {max_len: 8192}];
+	string extJSON = 6 [(validate.rules).string = {max_len: 8192}];
+	string ctrlJSON = 7 [(validate.rules).string = {max_len: 8192}];
+}
+
+message ReplyReviewReply {
+	int64 replyID = 1;
+}
+
+message AuditAppealRequest {}
+message AuditAppealReply {}
+
+message ListReviewByUseIdRequest {}

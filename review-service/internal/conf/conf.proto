@@ -9,6 +9,8 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Snowflake snowflake = 3;
+  Registry registry = 4;
+  Elasticsearch elasticsearch = 5;
 }
 
 message Server {
@@ -44,4 +46,17 @@ message Data {
 message Snowflake {
   string start_time = 1;
   int64 machine_id = 2;
+}
+
+message Registry {
+  message Consul {
+    string address = 1;
+    string scheme = 2;
+  }
+  Consul consul = 1;
+}
+
+message Elasticsearch {
+  repeated string addresses = 1;
+  string index = 2;
 }

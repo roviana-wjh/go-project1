@@ -1,0 +1,114 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /helloworld/{name}:
+        get:
+            tags:
+                - Greeter
+            description: Sends a greeting
+            operationId: Greeter_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+    /v1/op/review/appeal/audit:
+        post:
+            tags:
+                - Operation
+            description: 审核申诉
+            operationId: Operation_AuditAppeal
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.operation.v1.AuditAppealRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.operation.v1.AuditAppealReply'
+    /v1/op/review/audit:
+        post:
+            tags:
+                - Operation
+            description: 审核评价
+            operationId: Operation_AuditReview
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.operation.v1.AuditReviewRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.operation.v1.AuditReviewReply'
+components:
+    schemas:
+        api.operation.v1.AuditAppealReply:
+            type: object
+            properties: {}
+        api.operation.v1.AuditAppealRequest:
+            type: object
+            properties:
+                appealID:
+                    type: string
+                result:
+                    type: integer
+                    format: int32
+                remark:
+                    type: string
+                operator:
+                    type: string
+        api.operation.v1.AuditReviewReply:
+            type: object
+            properties:
+                reviewID:
+                    type: string
+                status:
+                    type: integer
+                    format: int32
+        api.operation.v1.AuditReviewRequest:
+            type: object
+            properties:
+                reviewID:
+                    type: string
+                result:
+                    type: integer
+                    description: 1=通过 2=驳回（与 review-service 一致）
+                    format: int32
+                remark:
+                    type: string
+                operator:
+                    type: string
+        helloworld.v1.HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
+tags:
+    - name: Greeter
+      description: The greeting service definition.
+    - name: Operation
+      description: Operation 运营端：转发 review-service 的审核能力

@@ -8,7 +8,7 @@ server:
 data:
   database:
     driver: mysql
-    source: root:lwnznxf5555@tcp(127.0.0.1:3306)/test
+    source: root:lwnznxf5555@tcp(127.0.0.1:3306)/test?parseTime=true&loc=Local
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s
@@ -18,3 +18,12 @@ data:
 snowflake:
   start_time: 2026-03-24T00:00:00Z
   machine_id: 1
+
+registry:
+  consul:
+    address: 127.0.0.1:8500
+    scheme: http
+elasticsearch:
+  addresses:
+    - http://localhost:9200
+  index: "review"
