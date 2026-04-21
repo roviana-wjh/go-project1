@@ -19,8 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Operation_AuditReview_FullMethodName = "/api.operation.v1.Operation/AuditReview"
-	Operation_AuditAppeal_FullMethodName = "/api.operation.v1.Operation/AuditAppeal"
+	Operation_AuditReview_FullMethodName        = "/api.operation.v1.Operation/AuditReview"
+	Operation_AuditAppeal_FullMethodName        = "/api.operation.v1.Operation/AuditAppeal"
+	Operation_ListPendingReviews_FullMethodName = "/api.operation.v1.Operation/ListPendingReviews"
+	Operation_ListPendingAppeals_FullMethodName = "/api.operation.v1.Operation/ListPendingAppeals"
 )
 
 // OperationClient is the client API for Operation service.
@@ -33,6 +35,10 @@ type OperationClient interface {
 	AuditReview(ctx context.Context, in *AuditReviewRequest, opts ...grpc.CallOption) (*AuditReviewReply, error)
 	// 审核申诉
 	AuditAppeal(ctx context.Context, in *AuditAppealRequest, opts ...grpc.CallOption) (*AuditAppealReply, error)
+	// 拉取待审核评价列表（运营看板）
+	ListPendingReviews(ctx context.Context, in *ListPendingReviewsRequest, opts ...grpc.CallOption) (*ListPendingReviewsReply, error)
+	// 拉取待审核申诉列表（运营看板）
+	ListPendingAppeals(ctx context.Context, in *ListPendingAppealsRequest, opts ...grpc.CallOption) (*ListPendingAppealsReply, error)
 }
 
 type operationClient struct {
@@ -63,6 +69,26 @@ func (c *operationClient) AuditAppeal(ctx context.Context, in *AuditAppealReques
 	return out, nil
 }
 
+func (c *operationClient) ListPendingReviews(ctx context.Context, in *ListPendingReviewsRequest, opts ...grpc.CallOption) (*ListPendingReviewsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPendingReviewsReply)
+	err := c.cc.Invoke(ctx, Operation_ListPendingReviews_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *operationClient) ListPendingAppeals(ctx context.Context, in *ListPendingAppealsRequest, opts ...grpc.CallOption) (*ListPendingAppealsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPendingAppealsReply)
+	err := c.cc.Invoke(ctx, Operation_ListPendingAppeals_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OperationServer is the server API for Operation service.
 // All implementations must embed UnimplementedOperationServer
 // for forward compatibility.
@@ -73,6 +99,10 @@ type OperationServer interface {
 	AuditReview(context.Context, *AuditReviewRequest) (*AuditReviewReply, error)
 	// 审核申诉
 	AuditAppeal(context.Context, *AuditAppealRequest) (*AuditAppealReply, error)
+	// 拉取待审核评价列表（运营看板）
+	ListPendingReviews(context.Context, *ListPendingReviewsRequest) (*ListPendingReviewsReply, error)
+	// 拉取待审核申诉列表（运营看板）
+	ListPendingAppeals(context.Context, *ListPendingAppealsRequest) (*ListPendingAppealsReply, error)
 	mustEmbedUnimplementedOperationServer()
 }
 
@@ -88,6 +118,12 @@ func (UnimplementedOperationServer) AuditReview(context.Context, *AuditReviewReq
 }
 func (UnimplementedOperationServer) AuditAppeal(context.Context, *AuditAppealRequest) (*AuditAppealReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method AuditAppeal not implemented")
+}
+func (UnimplementedOperationServer) ListPendingReviews(context.Context, *ListPendingReviewsRequest) (*ListPendingReviewsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPendingReviews not implemented")
+}
+func (UnimplementedOperationServer) ListPendingAppeals(context.Context, *ListPendingAppealsRequest) (*ListPendingAppealsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPendingAppeals not implemented")
 }
 func (UnimplementedOperationServer) mustEmbedUnimplementedOperationServer() {}
 func (UnimplementedOperationServer) testEmbeddedByValue()                   {}
@@ -146,6 +182,42 @@ func _Operation_AuditAppeal_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Operation_ListPendingReviews_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPendingReviewsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OperationServer).ListPendingReviews(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Operation_ListPendingReviews_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OperationServer).ListPendingReviews(ctx, req.(*ListPendingReviewsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Operation_ListPendingAppeals_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPendingAppealsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OperationServer).ListPendingAppeals(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Operation_ListPendingAppeals_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OperationServer).ListPendingAppeals(ctx, req.(*ListPendingAppealsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Operation_ServiceDesc is the grpc.ServiceDesc for Operation service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -160,6 +232,14 @@ var Operation_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AuditAppeal",
 			Handler:    _Operation_AuditAppeal_Handler,
+		},
+		{
+			MethodName: "ListPendingReviews",
+			Handler:    _Operation_ListPendingReviews_Handler,
+		},
+		{
+			MethodName: "ListPendingAppeals",
+			Handler:    _Operation_ListPendingAppeals_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

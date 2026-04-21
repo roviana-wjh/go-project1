@@ -15,7 +15,7 @@ import (
 // 与表 review_info.status 注释一致：10 待审核；20 通过；30 不通过；40 隐藏
 const (
 	ReviewStatusPending  int32 = 10
-	reviewStatusApproved int32 = 20
+	ReviewStatusApproved int32 = 20
 	reviewStatusRejected int32 = 30
 	reviewStatusHidden   int32 = 40
 )
@@ -28,9 +28,14 @@ type ReviewRepo interface {
 	ListByOrderID(ctx context.Context, p *ReviewListOrderParams) ([]*model.ReviewInfo, int64, error)
 	ListByUseId(ctx context.Context, p *ReviewListUserParams) ([]*model.ReviewInfo, int64, error)
 	ListByStoreId(ctx context.Context, p *ReviewListStoreParams) ([]*model.ReviewInfo, int64, error)
+	ListGoodsScoreRank(ctx context.Context, p *GoodsScoreRankParams) ([]*GoodsScoreRankItem, int64, error)
+	ListPending(ctx context.Context, p *ReviewListPendingParams) ([]*model.ReviewInfo, int64, error)
+	ListPendingAppeals(ctx context.Context, p *AppealListPendingParams) ([]*model.ReviewAppealInfo, int64, error)
 	UpdateReview(ctx context.Context, m *model.ReviewInfo) error
 	DeleteByReviewID(ctx context.Context, reviewID int64) error
 	GetByAppealID(ctx context.Context, appealID int64) (*model.ReviewAppealInfo, error)
+	SaveAppeal(ctx context.Context, m *model.ReviewAppealInfo) (*model.ReviewAppealInfo, error)
+	UpdateAppeal(ctx context.Context, m *model.ReviewAppealInfo) error
 }
 
 type ReviewUsecase struct {
@@ -156,7 +161,7 @@ func (uc *ReviewUsecase) AuditReview(ctx context.Context, p *AuditReviewParams) 
 	}
 	switch p.Result {
 	case 1:
-		row.Status = reviewStatusApproved
+		row.Status = ReviewStatusApproved
 		if p.Remark != "" {
 			row.OpRemarks = p.Remark
 		}
@@ -180,20 +185,25 @@ func (uc *ReviewUsecase) AppealReview(ctx context.Context, p *AppealReviewParams
 	if err != nil {
 		return nil, err
 	}
-	if row.UserID != p.UserID {
-		return nil, pb.ErrorForbidden("无权申诉他人评价")
+	// 仅商家可以对自家店铺下的评价发起申诉。
+	// 注意：此处的 p.UserID 实际是商家账号 ID，与 row.UserID（消费者）不同。
+	// 因此用 StoreID 校验更合理；若调用方没传 StoreID 则跳过这层校验，权限交由网关把控。
+	if p.StoreID != 0 && row.StoreID != p.StoreID {
+		return nil, pb.ErrorForbidden("无权对其他店铺评价发起申诉")
 	}
-	return &model.ReviewAppealInfo{
+	appeal := &model.ReviewAppealInfo{
 		AppealID: snowflake.GenID(),
 		ReviewID: p.ReviewID,
 		StoreID:  row.StoreID,
+		Status:   ReviewStatusPending,
 		Reason:   p.Reason,
 		PicInfo:  p.PicInfo,
 		CreateBy: fmt.Sprintf("%d", p.UserID),
 		UpdateBy: fmt.Sprintf("%d", p.UserID),
 		CreateAt: time.Now(),
 		UpdateAt: time.Now(),
-	}, nil
+	}
+	return uc.repo.SaveAppeal(ctx, appeal)
 }
 
 func (uc *ReviewUsecase) AuditAppeal(ctx context.Context, p *AuditAppealParams) (*model.ReviewAppealInfo, error) {
@@ -205,18 +215,22 @@ func (uc *ReviewUsecase) AuditAppeal(ctx context.Context, p *AuditAppealParams) 
 	if row.Status != ReviewStatusPending {
 		return nil, pb.ErrorReviewStatusInvalid("仅待审核状态可运营审核 (status=%d)", row.Status)
 	}
-	return &model.ReviewAppealInfo{
-		AppealID: p.AppealID,
-		ReviewID: row.ReviewID,
-		StoreID:  row.StoreID,
-		Reason:   row.Reason,
-		PicInfo:  row.PicInfo,
-		CreateBy: row.CreateBy,
-		UpdateBy: p.Operator,
-		CreateAt: time.Now(),
-		UpdateAt: time.Now(),
-		Status:   p.Result,
-	}, nil
+	switch p.Result {
+	case 1:
+		row.Status = ReviewStatusApproved
+	case 2:
+		row.Status = reviewStatusRejected
+	default:
+		return nil, pb.ErrorInvalidParameter("result 须为 1(通过) 或 2(驳回)")
+	}
+	row.OpRemarks = p.Remark
+	row.OpUser = p.Operator
+	row.UpdateBy = p.Operator
+	row.UpdateAt = time.Now()
+	if err := uc.repo.UpdateAppeal(ctx, row); err != nil {
+		return nil, err
+	}
+	return row, nil
 }
 
 func (uc *ReviewUsecase) ListReviewByUseId(ctx context.Context, p *ReviewListUserParams) ([]*model.ReviewInfo, int64, error) {
@@ -227,4 +241,19 @@ func (uc *ReviewUsecase) ListReviewByUseId(ctx context.Context, p *ReviewListUse
 func (uc *ReviewUsecase) ListReviewByStoreId(ctx context.Context, p *ReviewListStoreParams) ([]*model.ReviewInfo, int64, error) {
 	uc.log.WithContext(ctx).Debugf("[biz] list review by store: %+v", p)
 	return uc.repo.ListByStoreId(ctx, p)
+}
+
+func (uc *ReviewUsecase) ListPendingReviews(ctx context.Context, p *ReviewListPendingParams) ([]*model.ReviewInfo, int64, error) {
+	uc.log.WithContext(ctx).Debugf("[biz] list pending reviews: %+v", p)
+	return uc.repo.ListPending(ctx, p)
+}
+
+func (uc *ReviewUsecase) ListPendingAppeals(ctx context.Context, p *AppealListPendingParams) ([]*model.ReviewAppealInfo, int64, error) {
+	uc.log.WithContext(ctx).Debugf("[biz] list pending appeals: %+v", p)
+	return uc.repo.ListPendingAppeals(ctx, p)
+}
+
+func (uc *ReviewUsecase) ListGoodsScoreRank(ctx context.Context, p *GoodsScoreRankParams) ([]*GoodsScoreRankItem, int64, error) {
+	uc.log.WithContext(ctx).Debugf("[biz] list goods score rank: %+v", p)
+	return uc.repo.ListGoodsScoreRank(ctx, p)
 }

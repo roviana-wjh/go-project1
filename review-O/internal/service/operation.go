@@ -33,3 +33,17 @@ func (s *OperationService) AuditAppeal(ctx context.Context, req *pb.AuditAppealR
 	}
 	return s.uc.AuditAppeal(ctx, req)
 }
+
+func (s *OperationService) ListPendingReviews(ctx context.Context, req *pb.ListPendingReviewsRequest) (*pb.ListPendingReviewsReply, error) {
+	if err := req.Validate(); err != nil {
+		return nil, kerrors.BadRequest("VALIDATION_FAILED", err.Error())
+	}
+	return s.uc.ListPendingReviews(ctx, req)
+}
+
+func (s *OperationService) ListPendingAppeals(ctx context.Context, req *pb.ListPendingAppealsRequest) (*pb.ListPendingAppealsReply, error) {
+	if err := req.Validate(); err != nil {
+		return nil, kerrors.BadRequest("VALIDATION_FAILED", err.Error())
+	}
+	return s.uc.ListPendingAppeals(ctx, req)
+}

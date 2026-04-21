@@ -56,3 +56,80 @@ func (uc *OperationUsecase) AuditAppeal(ctx context.Context, req *opv1.AuditAppe
 	}
 	return &opv1.AuditAppealReply{}, nil
 }
+
+func toPendingReviewItem(in *reviewv1.ReviewListItem) *opv1.PendingReviewItem {
+	if in == nil {
+		return nil
+	}
+	return &opv1.PendingReviewItem{
+		ReviewID:     in.GetReviewID(),
+		UserID:       in.GetUserID(),
+		OrderID:      in.GetOrderID(),
+		Score:        in.GetScore(),
+		ServiceScore: in.GetServiceScore(),
+		ExpressScore: in.GetExpressScore(),
+		Content:      in.GetContent(),
+		PicInfo:      in.GetPicInfo(),
+		VideoInfo:    in.GetVideoInfo(),
+		Status:       in.GetStatus(),
+		HasReply:     in.GetHasReply(),
+		CreateAt:     in.GetCreateAt(),
+	}
+}
+
+func toPendingAppealItem(in *reviewv1.AppealListItem) *opv1.PendingAppealItem {
+	if in == nil {
+		return nil
+	}
+	return &opv1.PendingAppealItem{
+		AppealID:  in.GetAppealID(),
+		ReviewID:  in.GetReviewID(),
+		StoreID:   in.GetStoreID(),
+		Status:    in.GetStatus(),
+		Reason:    in.GetReason(),
+		Content:   in.GetContent(),
+		PicInfo:   in.GetPicInfo(),
+		VideoInfo: in.GetVideoInfo(),
+		OpRemarks: in.GetOpRemarks(),
+		OpUser:    in.GetOpUser(),
+		CreateAt:  in.GetCreateAt(),
+	}
+}
+
+func (uc *OperationUsecase) ListPendingReviews(ctx context.Context, req *opv1.ListPendingReviewsRequest) (*opv1.ListPendingReviewsReply, error) {
+	uc.log.WithContext(ctx).Debugf("[biz] ListPendingReviews page=%d pageSize=%d", req.GetPage(), req.GetPageSize())
+	out, err := uc.review.ListPendingReviews(ctx, &reviewv1.ListPendingReviewsRequest{
+		Page:     req.GetPage(),
+		PageSize: req.GetPageSize(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	list := make([]*opv1.PendingReviewItem, 0, len(out.GetList()))
+	for _, item := range out.GetList() {
+		list = append(list, toPendingReviewItem(item))
+	}
+	return &opv1.ListPendingReviewsReply{
+		List:  list,
+		Total: out.GetTotal(),
+	}, nil
+}
+
+func (uc *OperationUsecase) ListPendingAppeals(ctx context.Context, req *opv1.ListPendingAppealsRequest) (*opv1.ListPendingAppealsReply, error) {
+	uc.log.WithContext(ctx).Debugf("[biz] ListPendingAppeals page=%d pageSize=%d", req.GetPage(), req.GetPageSize())
+	out, err := uc.review.ListPendingAppeals(ctx, &reviewv1.ListPendingAppealsRequest{
+		Page:     req.GetPage(),
+		PageSize: req.GetPageSize(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	list := make([]*opv1.PendingAppealItem, 0, len(out.GetList()))
+	for _, item := range out.GetList() {
+		list = append(list, toPendingAppealItem(item))
+	}
+	return &opv1.ListPendingAppealsReply{
+		List:  list,
+		Total: out.GetTotal(),
+	}, nil
+}

@@ -248,6 +248,470 @@ func (*AuditAppealReply) Descriptor() ([]byte, []int) {
 	return file_operation_v1_operation_proto_rawDescGZIP(), []int{3}
 }
 
+type ListPendingReviewsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPendingReviewsRequest) Reset() {
+	*x = ListPendingReviewsRequest{}
+	mi := &file_operation_v1_operation_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPendingReviewsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPendingReviewsRequest) ProtoMessage() {}
+
+func (x *ListPendingReviewsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_operation_v1_operation_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPendingReviewsRequest.ProtoReflect.Descriptor instead.
+func (*ListPendingReviewsRequest) Descriptor() ([]byte, []int) {
+	return file_operation_v1_operation_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ListPendingReviewsRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListPendingReviewsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type PendingReviewItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReviewID      int64                  `protobuf:"varint,1,opt,name=reviewID,proto3" json:"reviewID,omitempty"`
+	UserID        int64                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	OrderID       int64                  `protobuf:"varint,3,opt,name=orderID,proto3" json:"orderID,omitempty"`
+	Score         int32                  `protobuf:"varint,4,opt,name=score,proto3" json:"score,omitempty"`
+	ServiceScore  int32                  `protobuf:"varint,5,opt,name=serviceScore,proto3" json:"serviceScore,omitempty"`
+	ExpressScore  int32                  `protobuf:"varint,6,opt,name=expressScore,proto3" json:"expressScore,omitempty"`
+	Content       string                 `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"`
+	PicInfo       string                 `protobuf:"bytes,8,opt,name=picInfo,proto3" json:"picInfo,omitempty"`
+	VideoInfo     string                 `protobuf:"bytes,9,opt,name=videoInfo,proto3" json:"videoInfo,omitempty"`
+	Status        int32                  `protobuf:"varint,10,opt,name=status,proto3" json:"status,omitempty"`
+	HasReply      int32                  `protobuf:"varint,11,opt,name=hasReply,proto3" json:"hasReply,omitempty"`
+	CreateAt      int64                  `protobuf:"varint,12,opt,name=createAt,proto3" json:"createAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PendingReviewItem) Reset() {
+	*x = PendingReviewItem{}
+	mi := &file_operation_v1_operation_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PendingReviewItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PendingReviewItem) ProtoMessage() {}
+
+func (x *PendingReviewItem) ProtoReflect() protoreflect.Message {
+	mi := &file_operation_v1_operation_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PendingReviewItem.ProtoReflect.Descriptor instead.
+func (*PendingReviewItem) Descriptor() ([]byte, []int) {
+	return file_operation_v1_operation_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PendingReviewItem) GetReviewID() int64 {
+	if x != nil {
+		return x.ReviewID
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetUserID() int64 {
+	if x != nil {
+		return x.UserID
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetOrderID() int64 {
+	if x != nil {
+		return x.OrderID
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetScore() int32 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetServiceScore() int32 {
+	if x != nil {
+		return x.ServiceScore
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetExpressScore() int32 {
+	if x != nil {
+		return x.ExpressScore
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *PendingReviewItem) GetPicInfo() string {
+	if x != nil {
+		return x.PicInfo
+	}
+	return ""
+}
+
+func (x *PendingReviewItem) GetVideoInfo() string {
+	if x != nil {
+		return x.VideoInfo
+	}
+	return ""
+}
+
+func (x *PendingReviewItem) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetHasReply() int32 {
+	if x != nil {
+		return x.HasReply
+	}
+	return 0
+}
+
+func (x *PendingReviewItem) GetCreateAt() int64 {
+	if x != nil {
+		return x.CreateAt
+	}
+	return 0
+}
+
+type ListPendingReviewsReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*PendingReviewItem   `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPendingReviewsReply) Reset() {
+	*x = ListPendingReviewsReply{}
+	mi := &file_operation_v1_operation_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPendingReviewsReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPendingReviewsReply) ProtoMessage() {}
+
+func (x *ListPendingReviewsReply) ProtoReflect() protoreflect.Message {
+	mi := &file_operation_v1_operation_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPendingReviewsReply.ProtoReflect.Descriptor instead.
+func (*ListPendingReviewsReply) Descriptor() ([]byte, []int) {
+	return file_operation_v1_operation_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListPendingReviewsReply) GetList() []*PendingReviewItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *ListPendingReviewsReply) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type ListPendingAppealsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize      int32                  `protobuf:"varint,2,opt,name=pageSize,proto3" json:"pageSize,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPendingAppealsRequest) Reset() {
+	*x = ListPendingAppealsRequest{}
+	mi := &file_operation_v1_operation_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPendingAppealsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPendingAppealsRequest) ProtoMessage() {}
+
+func (x *ListPendingAppealsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_operation_v1_operation_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPendingAppealsRequest.ProtoReflect.Descriptor instead.
+func (*ListPendingAppealsRequest) Descriptor() ([]byte, []int) {
+	return file_operation_v1_operation_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListPendingAppealsRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListPendingAppealsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+type PendingAppealItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AppealID      int64                  `protobuf:"varint,1,opt,name=appealID,proto3" json:"appealID,omitempty"`
+	ReviewID      int64                  `protobuf:"varint,2,opt,name=reviewID,proto3" json:"reviewID,omitempty"`
+	StoreID       int64                  `protobuf:"varint,3,opt,name=storeID,proto3" json:"storeID,omitempty"`
+	Status        int32                  `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
+	Reason        string                 `protobuf:"bytes,5,opt,name=reason,proto3" json:"reason,omitempty"`
+	Content       string                 `protobuf:"bytes,6,opt,name=content,proto3" json:"content,omitempty"`
+	PicInfo       string                 `protobuf:"bytes,7,opt,name=picInfo,proto3" json:"picInfo,omitempty"`
+	VideoInfo     string                 `protobuf:"bytes,8,opt,name=videoInfo,proto3" json:"videoInfo,omitempty"`
+	OpRemarks     string                 `protobuf:"bytes,9,opt,name=opRemarks,proto3" json:"opRemarks,omitempty"`
+	OpUser        string                 `protobuf:"bytes,10,opt,name=opUser,proto3" json:"opUser,omitempty"`
+	CreateAt      int64                  `protobuf:"varint,11,opt,name=createAt,proto3" json:"createAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PendingAppealItem) Reset() {
+	*x = PendingAppealItem{}
+	mi := &file_operation_v1_operation_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PendingAppealItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PendingAppealItem) ProtoMessage() {}
+
+func (x *PendingAppealItem) ProtoReflect() protoreflect.Message {
+	mi := &file_operation_v1_operation_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PendingAppealItem.ProtoReflect.Descriptor instead.
+func (*PendingAppealItem) Descriptor() ([]byte, []int) {
+	return file_operation_v1_operation_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *PendingAppealItem) GetAppealID() int64 {
+	if x != nil {
+		return x.AppealID
+	}
+	return 0
+}
+
+func (x *PendingAppealItem) GetReviewID() int64 {
+	if x != nil {
+		return x.ReviewID
+	}
+	return 0
+}
+
+func (x *PendingAppealItem) GetStoreID() int64 {
+	if x != nil {
+		return x.StoreID
+	}
+	return 0
+}
+
+func (x *PendingAppealItem) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
+}
+
+func (x *PendingAppealItem) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+func (x *PendingAppealItem) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *PendingAppealItem) GetPicInfo() string {
+	if x != nil {
+		return x.PicInfo
+	}
+	return ""
+}
+
+func (x *PendingAppealItem) GetVideoInfo() string {
+	if x != nil {
+		return x.VideoInfo
+	}
+	return ""
+}
+
+func (x *PendingAppealItem) GetOpRemarks() string {
+	if x != nil {
+		return x.OpRemarks
+	}
+	return ""
+}
+
+func (x *PendingAppealItem) GetOpUser() string {
+	if x != nil {
+		return x.OpUser
+	}
+	return ""
+}
+
+func (x *PendingAppealItem) GetCreateAt() int64 {
+	if x != nil {
+		return x.CreateAt
+	}
+	return 0
+}
+
+type ListPendingAppealsReply struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*PendingAppealItem   `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPendingAppealsReply) Reset() {
+	*x = ListPendingAppealsReply{}
+	mi := &file_operation_v1_operation_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPendingAppealsReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPendingAppealsReply) ProtoMessage() {}
+
+func (x *ListPendingAppealsReply) ProtoReflect() protoreflect.Message {
+	mi := &file_operation_v1_operation_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPendingAppealsReply.ProtoReflect.Descriptor instead.
+func (*ListPendingAppealsReply) Descriptor() ([]byte, []int) {
+	return file_operation_v1_operation_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListPendingAppealsReply) GetList() []*PendingAppealItem {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *ListPendingAppealsReply) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
 var File_operation_v1_operation_proto protoreflect.FileDescriptor
 
 const file_operation_v1_operation_proto_rawDesc = "" +
@@ -268,10 +732,51 @@ const file_operation_v1_operation_proto_rawDesc = "" +
 	"\x06remark\x18\x03 \x01(\tB\b\xfaB\x05r\x03\x18\xd0\x0fR\x06remark\x12&\n" +
 	"\boperator\x18\x04 \x01(\tB\n" +
 	"\xfaB\ar\x05\x10\x01\x18\x80\x01R\boperator\"\x12\n" +
-	"\x10AuditAppealReply2\x84\x02\n" +
+	"\x10AuditAppealReply\"_\n" +
+	"\x19ListPendingReviewsRequest\x12\x1b\n" +
+	"\x04page\x18\x01 \x01(\x05B\a\xfaB\x04\x1a\x02(\x01R\x04page\x12%\n" +
+	"\bpageSize\x18\x02 \x01(\x05B\t\xfaB\x06\x1a\x04\x18d(\x01R\bpageSize\"\xe1\x02\n" +
+	"\x11PendingReviewItem\x12\x1a\n" +
+	"\breviewID\x18\x01 \x01(\x03R\breviewID\x12\x16\n" +
+	"\x06userID\x18\x02 \x01(\x03R\x06userID\x12\x18\n" +
+	"\aorderID\x18\x03 \x01(\x03R\aorderID\x12\x14\n" +
+	"\x05score\x18\x04 \x01(\x05R\x05score\x12\"\n" +
+	"\fserviceScore\x18\x05 \x01(\x05R\fserviceScore\x12\"\n" +
+	"\fexpressScore\x18\x06 \x01(\x05R\fexpressScore\x12\x18\n" +
+	"\acontent\x18\a \x01(\tR\acontent\x12\x18\n" +
+	"\apicInfo\x18\b \x01(\tR\apicInfo\x12\x1c\n" +
+	"\tvideoInfo\x18\t \x01(\tR\tvideoInfo\x12\x16\n" +
+	"\x06status\x18\n" +
+	" \x01(\x05R\x06status\x12\x1a\n" +
+	"\bhasReply\x18\v \x01(\x05R\bhasReply\x12\x1a\n" +
+	"\bcreateAt\x18\f \x01(\x03R\bcreateAt\"h\n" +
+	"\x17ListPendingReviewsReply\x127\n" +
+	"\x04list\x18\x01 \x03(\v2#.api.operation.v1.PendingReviewItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x03R\x05total\"_\n" +
+	"\x19ListPendingAppealsRequest\x12\x1b\n" +
+	"\x04page\x18\x01 \x01(\x05B\a\xfaB\x04\x1a\x02(\x01R\x04page\x12%\n" +
+	"\bpageSize\x18\x02 \x01(\x05B\t\xfaB\x06\x1a\x04\x18d(\x01R\bpageSize\"\xb9\x02\n" +
+	"\x11PendingAppealItem\x12\x1a\n" +
+	"\bappealID\x18\x01 \x01(\x03R\bappealID\x12\x1a\n" +
+	"\breviewID\x18\x02 \x01(\x03R\breviewID\x12\x18\n" +
+	"\astoreID\x18\x03 \x01(\x03R\astoreID\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\x05R\x06status\x12\x16\n" +
+	"\x06reason\x18\x05 \x01(\tR\x06reason\x12\x18\n" +
+	"\acontent\x18\x06 \x01(\tR\acontent\x12\x18\n" +
+	"\apicInfo\x18\a \x01(\tR\apicInfo\x12\x1c\n" +
+	"\tvideoInfo\x18\b \x01(\tR\tvideoInfo\x12\x1c\n" +
+	"\topRemarks\x18\t \x01(\tR\topRemarks\x12\x16\n" +
+	"\x06opUser\x18\n" +
+	" \x01(\tR\x06opUser\x12\x1a\n" +
+	"\bcreateAt\x18\v \x01(\x03R\bcreateAt\"h\n" +
+	"\x17ListPendingAppealsReply\x127\n" +
+	"\x04list\x18\x01 \x03(\v2#.api.operation.v1.PendingAppealItemR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x03R\x05total2\xa7\x04\n" +
 	"\tOperation\x12w\n" +
 	"\vAuditReview\x12$.api.operation.v1.AuditReviewRequest\x1a\".api.operation.v1.AuditReviewReply\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/v1/op/review/audit\x12~\n" +
-	"\vAuditAppeal\x12$.api.operation.v1.AuditAppealRequest\x1a\".api.operation.v1.AuditAppealReply\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/v1/op/review/appeal/auditB2\n" +
+	"\vAuditAppeal\x12$.api.operation.v1.AuditAppealRequest\x1a\".api.operation.v1.AuditAppealReply\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/v1/op/review/appeal/audit\x12\x8b\x01\n" +
+	"\x12ListPendingReviews\x12+.api.operation.v1.ListPendingReviewsRequest\x1a).api.operation.v1.ListPendingReviewsReply\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/op/review/pending\x12\x92\x01\n" +
+	"\x12ListPendingAppeals\x12+.api.operation.v1.ListPendingAppealsRequest\x1a).api.operation.v1.ListPendingAppealsReply\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/v1/op/review/appeal/pendingB2\n" +
 	"\x10api.operation.v1P\x01Z\x1creview-O/api/operation/v1;v1b\x06proto3"
 
 var (
@@ -286,23 +791,35 @@ func file_operation_v1_operation_proto_rawDescGZIP() []byte {
 	return file_operation_v1_operation_proto_rawDescData
 }
 
-var file_operation_v1_operation_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_operation_v1_operation_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_operation_v1_operation_proto_goTypes = []any{
-	(*AuditReviewRequest)(nil), // 0: api.operation.v1.AuditReviewRequest
-	(*AuditReviewReply)(nil),   // 1: api.operation.v1.AuditReviewReply
-	(*AuditAppealRequest)(nil), // 2: api.operation.v1.AuditAppealRequest
-	(*AuditAppealReply)(nil),   // 3: api.operation.v1.AuditAppealReply
+	(*AuditReviewRequest)(nil),        // 0: api.operation.v1.AuditReviewRequest
+	(*AuditReviewReply)(nil),          // 1: api.operation.v1.AuditReviewReply
+	(*AuditAppealRequest)(nil),        // 2: api.operation.v1.AuditAppealRequest
+	(*AuditAppealReply)(nil),          // 3: api.operation.v1.AuditAppealReply
+	(*ListPendingReviewsRequest)(nil), // 4: api.operation.v1.ListPendingReviewsRequest
+	(*PendingReviewItem)(nil),         // 5: api.operation.v1.PendingReviewItem
+	(*ListPendingReviewsReply)(nil),   // 6: api.operation.v1.ListPendingReviewsReply
+	(*ListPendingAppealsRequest)(nil), // 7: api.operation.v1.ListPendingAppealsRequest
+	(*PendingAppealItem)(nil),         // 8: api.operation.v1.PendingAppealItem
+	(*ListPendingAppealsReply)(nil),   // 9: api.operation.v1.ListPendingAppealsReply
 }
 var file_operation_v1_operation_proto_depIdxs = []int32{
-	0, // 0: api.operation.v1.Operation.AuditReview:input_type -> api.operation.v1.AuditReviewRequest
-	2, // 1: api.operation.v1.Operation.AuditAppeal:input_type -> api.operation.v1.AuditAppealRequest
-	1, // 2: api.operation.v1.Operation.AuditReview:output_type -> api.operation.v1.AuditReviewReply
-	3, // 3: api.operation.v1.Operation.AuditAppeal:output_type -> api.operation.v1.AuditAppealReply
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	5, // 0: api.operation.v1.ListPendingReviewsReply.list:type_name -> api.operation.v1.PendingReviewItem
+	8, // 1: api.operation.v1.ListPendingAppealsReply.list:type_name -> api.operation.v1.PendingAppealItem
+	0, // 2: api.operation.v1.Operation.AuditReview:input_type -> api.operation.v1.AuditReviewRequest
+	2, // 3: api.operation.v1.Operation.AuditAppeal:input_type -> api.operation.v1.AuditAppealRequest
+	4, // 4: api.operation.v1.Operation.ListPendingReviews:input_type -> api.operation.v1.ListPendingReviewsRequest
+	7, // 5: api.operation.v1.Operation.ListPendingAppeals:input_type -> api.operation.v1.ListPendingAppealsRequest
+	1, // 6: api.operation.v1.Operation.AuditReview:output_type -> api.operation.v1.AuditReviewReply
+	3, // 7: api.operation.v1.Operation.AuditAppeal:output_type -> api.operation.v1.AuditAppealReply
+	6, // 8: api.operation.v1.Operation.ListPendingReviews:output_type -> api.operation.v1.ListPendingReviewsReply
+	9, // 9: api.operation.v1.Operation.ListPendingAppeals:output_type -> api.operation.v1.ListPendingAppealsReply
+	6, // [6:10] is the sub-list for method output_type
+	2, // [2:6] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_operation_v1_operation_proto_init() }
@@ -316,7 +833,7 @@ func file_operation_v1_operation_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_operation_v1_operation_proto_rawDesc), len(file_operation_v1_operation_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

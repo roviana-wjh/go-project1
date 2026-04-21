@@ -28,3 +28,11 @@ func (r *reviewForwardRepo) AuditReview(ctx context.Context, in *reviewv1.AuditR
 func (r *reviewForwardRepo) AuditAppeal(ctx context.Context, in *reviewv1.AuditAppealRequest) (*reviewv1.AuditAppealReply, error) {
 	return r.cli.AuditAppeal(ctx, in)
 }
+
+func (r *reviewForwardRepo) ListPendingReviews(ctx context.Context, in *reviewv1.ListPendingReviewsRequest) (*reviewv1.ListReviewReply, error) {
+	return r.cli.ListPendingReviews(ctx, in)
+}
+
+func (r *reviewForwardRepo) ListPendingAppeals(ctx context.Context, in *reviewv1.ListPendingAppealsRequest) (*reviewv1.ListPendingAppealsReply, error) {
+	return r.cli.ListPendingAppeals(ctx, in)
+}

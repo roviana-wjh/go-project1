@@ -308,6 +308,514 @@ var _ interface {
 	ErrorName() string
 } = ListReviewByStoreIdReplyValidationError{}
 
+// Validate checks the field values on ListPendingReviewsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListPendingReviewsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPendingReviewsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPendingReviewsRequestMultiError, or nil if none found.
+func (m *ListPendingReviewsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPendingReviewsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetPage() < 1 {
+		err := ListPendingReviewsRequestValidationError{
+			field:  "Page",
+			reason: "value must be greater than or equal to 1",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if val := m.GetPageSize(); val < 1 || val > 100 {
+		err := ListPendingReviewsRequestValidationError{
+			field:  "PageSize",
+			reason: "value must be inside range [1, 100]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ListPendingReviewsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListPendingReviewsRequestMultiError is an error wrapping multiple validation
+// errors returned by ListPendingReviewsRequest.ValidateAll() if the
+// designated constraints aren't met.
+type ListPendingReviewsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPendingReviewsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPendingReviewsRequestMultiError) AllErrors() []error { return m }
+
+// ListPendingReviewsRequestValidationError is the validation error returned by
+// ListPendingReviewsRequest.Validate if the designated constraints aren't met.
+type ListPendingReviewsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListPendingReviewsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListPendingReviewsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListPendingReviewsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListPendingReviewsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListPendingReviewsRequestValidationError) ErrorName() string {
+	return "ListPendingReviewsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListPendingReviewsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListPendingReviewsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListPendingReviewsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListPendingReviewsRequestValidationError{}
+
+// Validate checks the field values on ListPendingAppealsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListPendingAppealsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPendingAppealsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPendingAppealsRequestMultiError, or nil if none found.
+func (m *ListPendingAppealsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPendingAppealsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetPage() < 1 {
+		err := ListPendingAppealsRequestValidationError{
+			field:  "Page",
+			reason: "value must be greater than or equal to 1",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if val := m.GetPageSize(); val < 1 || val > 100 {
+		err := ListPendingAppealsRequestValidationError{
+			field:  "PageSize",
+			reason: "value must be inside range [1, 100]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ListPendingAppealsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListPendingAppealsRequestMultiError is an error wrapping multiple validation
+// errors returned by ListPendingAppealsRequest.ValidateAll() if the
+// designated constraints aren't met.
+type ListPendingAppealsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPendingAppealsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPendingAppealsRequestMultiError) AllErrors() []error { return m }
+
+// ListPendingAppealsRequestValidationError is the validation error returned by
+// ListPendingAppealsRequest.Validate if the designated constraints aren't met.
+type ListPendingAppealsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListPendingAppealsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListPendingAppealsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListPendingAppealsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListPendingAppealsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListPendingAppealsRequestValidationError) ErrorName() string {
+	return "ListPendingAppealsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListPendingAppealsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListPendingAppealsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListPendingAppealsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListPendingAppealsRequestValidationError{}
+
+// Validate checks the field values on AppealListItem with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AppealListItem) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AppealListItem with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AppealListItemMultiError,
+// or nil if none found.
+func (m *AppealListItem) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AppealListItem) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AppealID
+
+	// no validation rules for ReviewID
+
+	// no validation rules for StoreID
+
+	// no validation rules for Status
+
+	// no validation rules for Reason
+
+	// no validation rules for Content
+
+	// no validation rules for PicInfo
+
+	// no validation rules for VideoInfo
+
+	// no validation rules for OpRemarks
+
+	// no validation rules for OpUser
+
+	// no validation rules for CreateAt
+
+	if len(errors) > 0 {
+		return AppealListItemMultiError(errors)
+	}
+
+	return nil
+}
+
+// AppealListItemMultiError is an error wrapping multiple validation errors
+// returned by AppealListItem.ValidateAll() if the designated constraints
+// aren't met.
+type AppealListItemMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AppealListItemMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AppealListItemMultiError) AllErrors() []error { return m }
+
+// AppealListItemValidationError is the validation error returned by
+// AppealListItem.Validate if the designated constraints aren't met.
+type AppealListItemValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AppealListItemValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AppealListItemValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AppealListItemValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AppealListItemValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AppealListItemValidationError) ErrorName() string { return "AppealListItemValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AppealListItemValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAppealListItem.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AppealListItemValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AppealListItemValidationError{}
+
+// Validate checks the field values on ListPendingAppealsReply with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListPendingAppealsReply) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListPendingAppealsReply with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListPendingAppealsReplyMultiError, or nil if none found.
+func (m *ListPendingAppealsReply) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListPendingAppealsReply) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetList() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListPendingAppealsReplyValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListPendingAppealsReplyValidationError{
+						field:  fmt.Sprintf("List[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListPendingAppealsReplyValidationError{
+					field:  fmt.Sprintf("List[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Total
+
+	if len(errors) > 0 {
+		return ListPendingAppealsReplyMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListPendingAppealsReplyMultiError is an error wrapping multiple validation
+// errors returned by ListPendingAppealsReply.ValidateAll() if the designated
+// constraints aren't met.
+type ListPendingAppealsReplyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListPendingAppealsReplyMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListPendingAppealsReplyMultiError) AllErrors() []error { return m }
+
+// ListPendingAppealsReplyValidationError is the validation error returned by
+// ListPendingAppealsReply.Validate if the designated constraints aren't met.
+type ListPendingAppealsReplyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListPendingAppealsReplyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListPendingAppealsReplyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListPendingAppealsReplyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListPendingAppealsReplyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListPendingAppealsReplyValidationError) ErrorName() string {
+	return "ListPendingAppealsReplyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListPendingAppealsReplyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListPendingAppealsReply.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListPendingAppealsReplyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListPendingAppealsReplyValidationError{}
+
 // Validate checks the field values on CreateReviewRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -419,6 +927,17 @@ func (m *CreateReviewRequest) validate(all bool) error {
 	}
 
 	// no validation rules for Anonymous
+
+	if m.GetStoreID() <= 0 {
+		err := CreateReviewRequestValidationError{
+			field:  "StoreID",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return CreateReviewRequestMultiError(errors)

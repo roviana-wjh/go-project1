@@ -21,18 +21,26 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationOperationAuditAppeal = "/api.operation.v1.Operation/AuditAppeal"
 const OperationOperationAuditReview = "/api.operation.v1.Operation/AuditReview"
+const OperationOperationListPendingAppeals = "/api.operation.v1.Operation/ListPendingAppeals"
+const OperationOperationListPendingReviews = "/api.operation.v1.Operation/ListPendingReviews"
 
 type OperationHTTPServer interface {
 	// AuditAppeal 审核申诉
 	AuditAppeal(context.Context, *AuditAppealRequest) (*AuditAppealReply, error)
 	// AuditReview 审核评价
 	AuditReview(context.Context, *AuditReviewRequest) (*AuditReviewReply, error)
+	// ListPendingAppeals 拉取待审核申诉列表（运营看板）
+	ListPendingAppeals(context.Context, *ListPendingAppealsRequest) (*ListPendingAppealsReply, error)
+	// ListPendingReviews 拉取待审核评价列表（运营看板）
+	ListPendingReviews(context.Context, *ListPendingReviewsRequest) (*ListPendingReviewsReply, error)
 }
 
 func RegisterOperationHTTPServer(s *http.Server, srv OperationHTTPServer) {
 	r := s.Route("/")
 	r.POST("/v1/op/review/audit", _Operation_AuditReview0_HTTP_Handler(srv))
 	r.POST("/v1/op/review/appeal/audit", _Operation_AuditAppeal0_HTTP_Handler(srv))
+	r.GET("/v1/op/review/pending", _Operation_ListPendingReviews0_HTTP_Handler(srv))
+	r.GET("/v1/op/review/appeal/pending", _Operation_ListPendingAppeals0_HTTP_Handler(srv))
 }
 
 func _Operation_AuditReview0_HTTP_Handler(srv OperationHTTPServer) func(ctx http.Context) error {
@@ -79,11 +87,53 @@ func _Operation_AuditAppeal0_HTTP_Handler(srv OperationHTTPServer) func(ctx http
 	}
 }
 
+func _Operation_ListPendingReviews0_HTTP_Handler(srv OperationHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListPendingReviewsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationOperationListPendingReviews)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListPendingReviews(ctx, req.(*ListPendingReviewsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPendingReviewsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Operation_ListPendingAppeals0_HTTP_Handler(srv OperationHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListPendingAppealsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationOperationListPendingAppeals)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListPendingAppeals(ctx, req.(*ListPendingAppealsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPendingAppealsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type OperationHTTPClient interface {
 	// AuditAppeal 审核申诉
 	AuditAppeal(ctx context.Context, req *AuditAppealRequest, opts ...http.CallOption) (rsp *AuditAppealReply, err error)
 	// AuditReview 审核评价
 	AuditReview(ctx context.Context, req *AuditReviewRequest, opts ...http.CallOption) (rsp *AuditReviewReply, err error)
+	// ListPendingAppeals 拉取待审核申诉列表（运营看板）
+	ListPendingAppeals(ctx context.Context, req *ListPendingAppealsRequest, opts ...http.CallOption) (rsp *ListPendingAppealsReply, err error)
+	// ListPendingReviews 拉取待审核评价列表（运营看板）
+	ListPendingReviews(ctx context.Context, req *ListPendingReviewsRequest, opts ...http.CallOption) (rsp *ListPendingReviewsReply, err error)
 }
 
 type OperationHTTPClientImpl struct {
@@ -116,6 +166,34 @@ func (c *OperationHTTPClientImpl) AuditReview(ctx context.Context, in *AuditRevi
 	opts = append(opts, http.Operation(OperationOperationAuditReview))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListPendingAppeals 拉取待审核申诉列表（运营看板）
+func (c *OperationHTTPClientImpl) ListPendingAppeals(ctx context.Context, in *ListPendingAppealsRequest, opts ...http.CallOption) (*ListPendingAppealsReply, error) {
+	var out ListPendingAppealsReply
+	pattern := "/v1/op/review/appeal/pending"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationOperationListPendingAppeals))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListPendingReviews 拉取待审核评价列表（运营看板）
+func (c *OperationHTTPClientImpl) ListPendingReviews(ctx context.Context, in *ListPendingReviewsRequest, opts ...http.CallOption) (*ListPendingReviewsReply, error) {
+	var out ListPendingReviewsReply
+	pattern := "/v1/op/review/pending"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationOperationListPendingReviews))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

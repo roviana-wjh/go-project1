@@ -25,6 +25,8 @@ const OperationReviewAuditReview = "/api.review.v1.Review/AuditReview"
 const OperationReviewCreateReview = "/api.review.v1.Review/CreateReview"
 const OperationReviewDeleteReview = "/api.review.v1.Review/DeleteReview"
 const OperationReviewGetReview = "/api.review.v1.Review/GetReview"
+const OperationReviewListPendingAppeals = "/api.review.v1.Review/ListPendingAppeals"
+const OperationReviewListPendingReviews = "/api.review.v1.Review/ListPendingReviews"
 const OperationReviewListReview = "/api.review.v1.Review/ListReview"
 const OperationReviewListReviewByStoreId = "/api.review.v1.Review/ListReviewByStoreId"
 const OperationReviewListReviewByUseId = "/api.review.v1.Review/ListReviewByUseId"
@@ -44,6 +46,10 @@ type ReviewHTTPServer interface {
 	DeleteReview(context.Context, *DeleteReviewRequest) (*DeleteReviewReply, error)
 	// GetReview 获取单条评价（路径避免与 /v1/review/order、/v1/review/user 冲突）
 	GetReview(context.Context, *GetReviewRequest) (*GetReviewReply, error)
+	// ListPendingAppeals 运营端：分页获取待审核申诉（查 MySQL，强一致）
+	ListPendingAppeals(context.Context, *ListPendingAppealsRequest) (*ListPendingAppealsReply, error)
+	// ListPendingReviews 运营端：分页获取待审核评价（查 MySQL，强一致）
+	ListPendingReviews(context.Context, *ListPendingReviewsRequest) (*ListReviewReply, error)
 	// ListReview 按订单分页列评价
 	ListReview(context.Context, *ListReviewRequest) (*ListReviewReply, error)
 	// ListReviewByStoreId 按店铺分页列评价
@@ -69,6 +75,8 @@ func RegisterReviewHTTPServer(s *http.Server, srv ReviewHTTPServer) {
 	r.POST("/v1/review/appeal/audit", _Review_AuditAppeal0_HTTP_Handler(srv))
 	r.GET("/v1/review/user/{userID}", _Review_ListReviewByUseId0_HTTP_Handler(srv))
 	r.GET("/v1/review/store/{storeID}", _Review_ListReviewByStoreId0_HTTP_Handler(srv))
+	r.GET("/v1/review/pending", _Review_ListPendingReviews0_HTTP_Handler(srv))
+	r.GET("/v1/review/appeal/pending", _Review_ListPendingAppeals0_HTTP_Handler(srv))
 }
 
 func _Review_CreateReview0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
@@ -316,6 +324,44 @@ func _Review_ListReviewByStoreId0_HTTP_Handler(srv ReviewHTTPServer) func(ctx ht
 	}
 }
 
+func _Review_ListPendingReviews0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListPendingReviewsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewListPendingReviews)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListPendingReviews(ctx, req.(*ListPendingReviewsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListReviewReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Review_ListPendingAppeals0_HTTP_Handler(srv ReviewHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListPendingAppealsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationReviewListPendingAppeals)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListPendingAppeals(ctx, req.(*ListPendingAppealsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListPendingAppealsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ReviewHTTPClient interface {
 	// AppealReview 商家申诉评价
 	AppealReview(ctx context.Context, req *AppealReviewRequest, opts ...http.CallOption) (rsp *AppealReviewReply, err error)
@@ -329,6 +375,10 @@ type ReviewHTTPClient interface {
 	DeleteReview(ctx context.Context, req *DeleteReviewRequest, opts ...http.CallOption) (rsp *DeleteReviewReply, err error)
 	// GetReview 获取单条评价（路径避免与 /v1/review/order、/v1/review/user 冲突）
 	GetReview(ctx context.Context, req *GetReviewRequest, opts ...http.CallOption) (rsp *GetReviewReply, err error)
+	// ListPendingAppeals 运营端：分页获取待审核申诉（查 MySQL，强一致）
+	ListPendingAppeals(ctx context.Context, req *ListPendingAppealsRequest, opts ...http.CallOption) (rsp *ListPendingAppealsReply, err error)
+	// ListPendingReviews 运营端：分页获取待审核评价（查 MySQL，强一致）
+	ListPendingReviews(ctx context.Context, req *ListPendingReviewsRequest, opts ...http.CallOption) (rsp *ListReviewReply, err error)
 	// ListReview 按订单分页列评价
 	ListReview(ctx context.Context, req *ListReviewRequest, opts ...http.CallOption) (rsp *ListReviewReply, err error)
 	// ListReviewByStoreId 按店铺分页列评价
@@ -425,6 +475,34 @@ func (c *ReviewHTTPClientImpl) GetReview(ctx context.Context, in *GetReviewReque
 	pattern := "/v1/review/detail/{reviewID}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationReviewGetReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListPendingAppeals 运营端：分页获取待审核申诉（查 MySQL，强一致）
+func (c *ReviewHTTPClientImpl) ListPendingAppeals(ctx context.Context, in *ListPendingAppealsRequest, opts ...http.CallOption) (*ListPendingAppealsReply, error) {
+	var out ListPendingAppealsReply
+	pattern := "/v1/review/appeal/pending"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationReviewListPendingAppeals))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListPendingReviews 运营端：分页获取待审核评价（查 MySQL，强一致）
+func (c *ReviewHTTPClientImpl) ListPendingReviews(ctx context.Context, in *ListPendingReviewsRequest, opts ...http.CallOption) (*ListReviewReply, error) {
+	var out ListReviewReply
+	pattern := "/v1/review/pending"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationReviewListPendingReviews))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

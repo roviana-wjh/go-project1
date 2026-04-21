@@ -39,6 +39,31 @@ type ReviewListStoreParams struct {
 	PageSize int32
 }
 
+// ReviewListPendingParams 运营端待审核分页列表
+type ReviewListPendingParams struct {
+	Page     int32
+	PageSize int32
+}
+
+// AppealListPendingParams 运营端待审核申诉分页列表
+type AppealListPendingParams struct {
+	Page     int32
+	PageSize int32
+}
+
+// GoodsScoreRankParams 商品评分排行分页参数
+type GoodsScoreRankParams struct {
+	Page     int32
+	PageSize int32
+}
+
+// GoodsScoreRankItem 商品评分排行项
+type GoodsScoreRankItem struct {
+	SpuID       int64
+	AvgScore    float64
+	ReviewCount int64
+}
+
 // AuditReviewParams 运营审核评价
 type AuditReviewParams struct {
 	ReviewID int64

@@ -103,23 +103,21 @@ func (j *JobWorker) Start(ctx context.Context) error {
 			j.Logger.Error("failed to unmarshal message from kafka", "error", err)
 			continue
 		}
-		if msg.Type == "INSERT" {
-			for i, item := range msg.Data {
-				row, ok := item.(map[string]interface{})
-				if !ok {
-					j.Logger.Error("kafka data row is not an object", "index", i)
-					continue
-				}
-				j.indexDocument(row)
+		for i, item := range msg.Data {
+			row, ok := item.(map[string]interface{})
+			if !ok {
+				j.Logger.Error("kafka data row is not an object", "index", i)
+				continue
 			}
-		} else {
-			for i, item := range msg.Data {
-				row, ok := item.(map[string]interface{})
-				if !ok {
-					j.Logger.Error("kafka data row is not an object", "index", i)
-					continue
-				}
+			switch msg.Type {
+			case "INSERT":
+				j.indexDocument(row)
+			case "UPDATE":
 				j.updateDocument(row)
+			case "DELETE":
+				j.deleteDocument(row)
+			default:
+				j.Logger.Warnf("ignore unsupported kafka event type=%s", msg.Type)
 			}
 		}
 	}
@@ -186,13 +184,12 @@ func createIndex(client *elasticsearch.TypedClient) {
 
 // updateDocument 更新文档
 func (j *JobWorker) updateDocument(d map[string]interface{}) {
-	// 修改后的结构体变量
-	reiewId := d["review_id"].(string)
-	if len(reiewId) == 0 {
+	reviewID, ok := reviewIDString(d["review_id"])
+	if !ok {
 		j.Logger.Error("review_id is empty")
 		return
 	}
-	resp, err := j.ESClient.Update(j.ESClient.index, reiewId).
+	resp, err := j.ESClient.Update(j.ESClient.index, reviewID).
 		Doc(d). // 使用结构体变量更新
 		Do(context.Background())
 	if err != nil {
@@ -204,14 +201,13 @@ func (j *JobWorker) updateDocument(d map[string]interface{}) {
 
 // indexDocument 索引文档
 func (j *JobWorker) indexDocument(d map[string]interface{}) {
-	reiewId := d["review_id"].(string)
-	// 添加文档
-	if len(reiewId) == 0 {
+	reviewID, ok := reviewIDString(d["review_id"])
+	if !ok {
 		j.Logger.Error("review_id is empty")
 		return
 	}
 	resp, err := j.ESClient.Index(j.ESClient.index).
-		Id(reiewId).
+		Id(reviewID).
 		Document(d).
 		Do(context.Background())
 	if err != nil {
@@ -219,6 +215,46 @@ func (j *JobWorker) indexDocument(d map[string]interface{}) {
 		return
 	}
 	j.Logger.Debug("indexed document", "result", resp.Result)
+}
+
+func (j *JobWorker) deleteDocument(d map[string]interface{}) {
+	reviewID, ok := reviewIDString(d["review_id"])
+	if !ok {
+		j.Logger.Error("review_id is empty")
+		return
+	}
+	resp, err := j.ESClient.Delete(j.ESClient.index, reviewID).Do(context.Background())
+	if err != nil {
+		j.Logger.Error("failed to delete document", "error", err)
+		return
+	}
+	j.Logger.Debug("deleted document", "result", resp.Result)
+}
+
+func reviewIDString(v interface{}) (string, bool) {
+	switch x := v.(type) {
+	case string:
+		return x, x != ""
+	case json.Number:
+		s := x.String()
+		return s, s != ""
+	case float64:
+		return fmt.Sprintf("%.0f", x), true
+	case float32:
+		return fmt.Sprintf("%.0f", x), true
+	case int:
+		return fmt.Sprintf("%d", x), true
+	case int64:
+		return fmt.Sprintf("%d", x), true
+	case int32:
+		return fmt.Sprintf("%d", x), true
+	case uint64:
+		return fmt.Sprintf("%d", x), true
+	case uint32:
+		return fmt.Sprintf("%d", x), true
+	default:
+		return "", false
+	}
 }
 
 // Tag 评价标签（供 ES 文档序列化使用）

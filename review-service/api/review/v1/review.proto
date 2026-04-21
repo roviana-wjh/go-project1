@@ -83,6 +83,18 @@ service Review {
 			get: "/v1/review/store/{storeID}"
 		};
 	}
+	// 运营端：分页获取待审核评价（查 MySQL，强一致）
+	rpc ListPendingReviews (ListPendingReviewsRequest) returns (ListReviewReply) {
+		option (google.api.http) = {
+			get: "/v1/review/pending"
+		};
+	}
+	// 运营端：分页获取待审核申诉（查 MySQL，强一致）
+	rpc ListPendingAppeals (ListPendingAppealsRequest) returns (ListPendingAppealsReply) {
+		option (google.api.http) = {
+			get: "/v1/review/appeal/pending"
+		};
+	}
 }
 
 // ---------- 创建 ----------
@@ -98,6 +110,35 @@ message ListReviewByStoreIdReply {
 	int64 total = 2;
 }
 
+message ListPendingReviewsRequest {
+	int32 page = 1 [(validate.rules).int32 = {gte: 1}];
+	int32 pageSize = 2 [(validate.rules).int32 = {gte: 1, lte: 100}];
+}
+
+message ListPendingAppealsRequest {
+	int32 page = 1 [(validate.rules).int32 = {gte: 1}];
+	int32 pageSize = 2 [(validate.rules).int32 = {gte: 1, lte: 100}];
+}
+
+message AppealListItem {
+	int64 appealID = 1;
+	int64 reviewID = 2;
+	int64 storeID = 3;
+	int32 status = 4;
+	string reason = 5;
+	string content = 6;
+	string picInfo = 7;
+	string videoInfo = 8;
+	string opRemarks = 9;
+	string opUser = 10;
+	int64 createAt = 11;
+}
+
+message ListPendingAppealsReply {
+	repeated AppealListItem list = 1;
+	int64 total = 2;
+}
+
 message CreateReviewRequest {
 	int64 userID = 1 [(validate.rules).int64 = {gt: 0}];
 	int64 orderID = 2 [(validate.rules).int64 = {gt: 0}];
@@ -108,6 +149,7 @@ message CreateReviewRequest {
 	string picInfo = 7 [(validate.rules).string = {max_len: 8192}];
 	string videoInfo = 8 [(validate.rules).string = {max_len: 8192}];
 	bool anonymous = 9;
+	int64 storeID = 10 [(validate.rules).int64 = {gt: 0}];
 }
 
 message CreateReviewReply {

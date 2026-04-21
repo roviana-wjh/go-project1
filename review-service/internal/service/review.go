@@ -2,12 +2,17 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	pb "review-service/api/review/v1"
 	"review-service/internal/biz"
 	"review-service/internal/data/model"
 )
+
+type GoodsScoreRankItem struct {
+	SpuID       int64   `json:"spuID"`
+	AvgScore    float64 `json:"avgScore"`
+	ReviewCount int64   `json:"reviewCount"`
+}
 
 type ReviewService struct {
 	pb.UnimplementedReviewServer
@@ -40,6 +45,25 @@ func reviewInfoToListItem(m *model.ReviewInfo) *pb.ReviewListItem {
 	}
 }
 
+func appealInfoToListItem(m *model.ReviewAppealInfo) *pb.AppealListItem {
+	if m == nil {
+		return nil
+	}
+	return &pb.AppealListItem{
+		AppealID:  m.AppealID,
+		ReviewID:  m.ReviewID,
+		StoreID:   m.StoreID,
+		Status:    m.Status,
+		Reason:    m.Reason,
+		Content:   m.Content,
+		PicInfo:   m.PicInfo,
+		VideoInfo: m.VideoInfo,
+		OpRemarks: m.OpRemarks,
+		OpUser:    m.OpUser,
+		CreateAt:  m.CreateAt.UnixMilli(),
+	}
+}
+
 func (s *ReviewService) CreateReview(ctx context.Context, req *pb.CreateReviewRequest) (*pb.CreateReviewReply, error) {
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
@@ -51,6 +75,7 @@ func (s *ReviewService) CreateReview(ctx context.Context, req *pb.CreateReviewRe
 	review, err := s.uc.CreateReview(ctx, &model.ReviewInfo{
 		UserID:       req.UserID,
 		OrderID:      req.OrderID,
+		StoreID:      req.StoreID,
 		Score:        req.Score,
 		ServiceScore: req.ServiceScore,
 		ExpressScore: req.ExpressScore,
@@ -70,7 +95,6 @@ func (s *ReviewService) UpdateReview(ctx context.Context, req *pb.UpdateReviewRe
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("UpdateReview：", req)
 	if _, err := s.uc.UpdateReview(ctx, &biz.UpdateReviewParams{
 		ReviewID:       req.ReviewID,
 		OperatorUserID: req.UserID,
@@ -90,7 +114,6 @@ func (s *ReviewService) DeleteReview(ctx context.Context, req *pb.DeleteReviewRe
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("DeleteReview：", req)
 	err := s.uc.DeleteReview(ctx, &biz.DeleteReviewParams{ReviewID: req.ReviewID, OperatorUserID: req.UserID})
 	if err != nil {
 		return nil, err
@@ -102,7 +125,6 @@ func (s *ReviewService) GetReview(ctx context.Context, req *pb.GetReviewRequest)
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("GetReview：", req)
 	review, err := s.uc.GetReview(ctx, req.ReviewID)
 	if err != nil {
 		return nil, err
@@ -114,7 +136,6 @@ func (s *ReviewService) ListReview(ctx context.Context, req *pb.ListReviewReques
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("ListReview：", req)
 	reviews, total, err := s.uc.ListReview(ctx, &biz.ReviewListOrderParams{
 		OrderID:  req.OrderID,
 		Page:     req.Page,
@@ -130,11 +151,46 @@ func (s *ReviewService) ListReview(ctx context.Context, req *pb.ListReviewReques
 	return &pb.ListReviewReply{List: list, Total: total}, nil
 }
 
+func (s *ReviewService) ListPendingReviews(ctx context.Context, req *pb.ListPendingReviewsRequest) (*pb.ListReviewReply, error) {
+	if err := req.Validate(); err != nil {
+		return nil, pb.ErrorInvalidParameter("%v", err)
+	}
+	reviews, total, err := s.uc.ListPendingReviews(ctx, &biz.ReviewListPendingParams{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		return nil, err
+	}
+	list := make([]*pb.ReviewListItem, 0, len(reviews))
+	for _, r := range reviews {
+		list = append(list, reviewInfoToListItem(r))
+	}
+	return &pb.ListReviewReply{List: list, Total: total}, nil
+}
+
+func (s *ReviewService) ListPendingAppeals(ctx context.Context, req *pb.ListPendingAppealsRequest) (*pb.ListPendingAppealsReply, error) {
+	if err := req.Validate(); err != nil {
+		return nil, pb.ErrorInvalidParameter("%v", err)
+	}
+	appeals, total, err := s.uc.ListPendingAppeals(ctx, &biz.AppealListPendingParams{
+		Page:     req.Page,
+		PageSize: req.PageSize,
+	})
+	if err != nil {
+		return nil, err
+	}
+	list := make([]*pb.AppealListItem, 0, len(appeals))
+	for _, a := range appeals {
+		list = append(list, appealInfoToListItem(a))
+	}
+	return &pb.ListPendingAppealsReply{List: list, Total: total}, nil
+}
+
 func (s *ReviewService) AuditReview(ctx context.Context, req *pb.AuditReviewRequest) (*pb.AuditReviewReply, error) {
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("AuditReview：", req)
 	review, err := s.uc.AuditReview(ctx, &biz.AuditReviewParams{
 		ReviewID: req.ReviewID,
 		Result:   req.Result,
@@ -151,7 +207,6 @@ func (s *ReviewService) ReplyReview(ctx context.Context, req *pb.ReplyReviewRequ
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("ReplyReview：", req)
 	reply, err := s.uc.CreateReply(ctx, &model.ReviewReplyInfo{
 		ReviewID:  req.ReviewID,
 		StoreID:   req.StoreID,
@@ -171,7 +226,6 @@ func (s *ReviewService) AppealReview(ctx context.Context, req *pb.AppealReviewRe
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("AppealReview：", req)
 	appeal, err := s.uc.AppealReview(ctx, &biz.AppealReviewParams{
 		UserID:   req.UserID,
 		ReviewID: req.ReviewID,
@@ -188,7 +242,6 @@ func (s *ReviewService) AuditAppeal(ctx context.Context, req *pb.AuditAppealRequ
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("AuditAppeal：", req)
 	_, err := s.uc.AuditAppeal(ctx, &biz.AuditAppealParams{
 		AppealID: req.AppealID,
 		Result:   req.Result,
@@ -205,7 +258,6 @@ func (s *ReviewService) ListReviewByUseId(ctx context.Context, req *pb.ListRevie
 	if err := req.Validate(); err != nil {
 		return nil, pb.ErrorInvalidParameter("%v", err)
 	}
-	fmt.Println("ListReviewByUseId：", req)
 	reviews, total, err := s.uc.ListReviewByUseId(ctx, &biz.ReviewListUserParams{
 		UserID:   req.UserID,
 		Page:     req.Page,
@@ -238,4 +290,23 @@ func (s *ReviewService) ListReviewByStoreId(ctx context.Context, req *pb.ListRev
 		list = append(list, reviewInfoToListItem(r))
 	}
 	return &pb.ListReviewByStoreIdReply{List: list, Total: total}, nil
+}
+
+func (s *ReviewService) ListGoodsScoreRank(ctx context.Context, page, pageSize int32) ([]*GoodsScoreRankItem, int64, error) {
+	list, total, err := s.uc.ListGoodsScoreRank(ctx, &biz.GoodsScoreRankParams{
+		Page:     page,
+		PageSize: pageSize,
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+	out := make([]*GoodsScoreRankItem, 0, len(list))
+	for i := range list {
+		out = append(out, &GoodsScoreRankItem{
+			SpuID:       list[i].SpuID,
+			AvgScore:    list[i].AvgScore,
+			ReviewCount: list[i].ReviewCount,
+		})
+	}
+	return out, total, nil
 }

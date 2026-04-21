@@ -30,6 +30,8 @@ const (
 	Review_AuditAppeal_FullMethodName         = "/api.review.v1.Review/AuditAppeal"
 	Review_ListReviewByUseId_FullMethodName   = "/api.review.v1.Review/ListReviewByUseId"
 	Review_ListReviewByStoreId_FullMethodName = "/api.review.v1.Review/ListReviewByStoreId"
+	Review_ListPendingReviews_FullMethodName  = "/api.review.v1.Review/ListPendingReviews"
+	Review_ListPendingAppeals_FullMethodName  = "/api.review.v1.Review/ListPendingAppeals"
 )
 
 // ReviewClient is the client API for Review service.
@@ -60,6 +62,10 @@ type ReviewClient interface {
 	ListReviewByUseId(ctx context.Context, in *ListReviewByUseIdRequest, opts ...grpc.CallOption) (*ListReviewReply, error)
 	// 按店铺分页列评价
 	ListReviewByStoreId(ctx context.Context, in *ListReviewByStoreIdRequest, opts ...grpc.CallOption) (*ListReviewByStoreIdReply, error)
+	// 运营端：分页获取待审核评价（查 MySQL，强一致）
+	ListPendingReviews(ctx context.Context, in *ListPendingReviewsRequest, opts ...grpc.CallOption) (*ListReviewReply, error)
+	// 运营端：分页获取待审核申诉（查 MySQL，强一致）
+	ListPendingAppeals(ctx context.Context, in *ListPendingAppealsRequest, opts ...grpc.CallOption) (*ListPendingAppealsReply, error)
 }
 
 type reviewClient struct {
@@ -180,6 +186,26 @@ func (c *reviewClient) ListReviewByStoreId(ctx context.Context, in *ListReviewBy
 	return out, nil
 }
 
+func (c *reviewClient) ListPendingReviews(ctx context.Context, in *ListPendingReviewsRequest, opts ...grpc.CallOption) (*ListReviewReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListReviewReply)
+	err := c.cc.Invoke(ctx, Review_ListPendingReviews_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reviewClient) ListPendingAppeals(ctx context.Context, in *ListPendingAppealsRequest, opts ...grpc.CallOption) (*ListPendingAppealsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPendingAppealsReply)
+	err := c.cc.Invoke(ctx, Review_ListPendingAppeals_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReviewServer is the server API for Review service.
 // All implementations must embed UnimplementedReviewServer
 // for forward compatibility.
@@ -208,6 +234,10 @@ type ReviewServer interface {
 	ListReviewByUseId(context.Context, *ListReviewByUseIdRequest) (*ListReviewReply, error)
 	// 按店铺分页列评价
 	ListReviewByStoreId(context.Context, *ListReviewByStoreIdRequest) (*ListReviewByStoreIdReply, error)
+	// 运营端：分页获取待审核评价（查 MySQL，强一致）
+	ListPendingReviews(context.Context, *ListPendingReviewsRequest) (*ListReviewReply, error)
+	// 运营端：分页获取待审核申诉（查 MySQL，强一致）
+	ListPendingAppeals(context.Context, *ListPendingAppealsRequest) (*ListPendingAppealsReply, error)
 	mustEmbedUnimplementedReviewServer()
 }
 
@@ -250,6 +280,12 @@ func (UnimplementedReviewServer) ListReviewByUseId(context.Context, *ListReviewB
 }
 func (UnimplementedReviewServer) ListReviewByStoreId(context.Context, *ListReviewByStoreIdRequest) (*ListReviewByStoreIdReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListReviewByStoreId not implemented")
+}
+func (UnimplementedReviewServer) ListPendingReviews(context.Context, *ListPendingReviewsRequest) (*ListReviewReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPendingReviews not implemented")
+}
+func (UnimplementedReviewServer) ListPendingAppeals(context.Context, *ListPendingAppealsRequest) (*ListPendingAppealsReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPendingAppeals not implemented")
 }
 func (UnimplementedReviewServer) mustEmbedUnimplementedReviewServer() {}
 func (UnimplementedReviewServer) testEmbeddedByValue()                {}
@@ -470,6 +506,42 @@ func _Review_ListReviewByStoreId_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Review_ListPendingReviews_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPendingReviewsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReviewServer).ListPendingReviews(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Review_ListPendingReviews_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReviewServer).ListPendingReviews(ctx, req.(*ListPendingReviewsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Review_ListPendingAppeals_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPendingAppealsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReviewServer).ListPendingAppeals(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Review_ListPendingAppeals_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReviewServer).ListPendingAppeals(ctx, req.(*ListPendingAppealsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Review_ServiceDesc is the grpc.ServiceDesc for Review service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -520,6 +592,14 @@ var Review_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListReviewByStoreId",
 			Handler:    _Review_ListReviewByStoreId_Handler,
+		},
+		{
+			MethodName: "ListPendingReviews",
+			Handler:    _Review_ListPendingReviews_Handler,
+		},
+		{
+			MethodName: "ListPendingAppeals",
+			Handler:    _Review_ListPendingAppeals_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
